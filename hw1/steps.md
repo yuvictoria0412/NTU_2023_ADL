@@ -1,30 +1,35 @@
 # ADL 2023 hw1
+## Preparation
+1. install *miniconda*
+2. conda create -n [*env_name*] python = [*python version*]
+3. conda activate [*env_name*]
+
 ## Steps
-1. download code *run_swag_no_trainer.py* from [huggingface](https://github.com/huggingface/transformers/blob/main/examples/pytorch/multiple-choice/run_swag_no_trainer.py)
-2. download *requirements.txt* and *run_no_trainer.sh*
-3. command
+1. download folder *multiple-choice* from [huggingface](https://github.com/huggingface/transformers/tree/main/examples/pytorch/multiple-choice)
+2. add to file *requirements.txt*:
 ```
-pip install -r requirements.txt
+transformers >= 4.33.3
+scikit-learn >= 1.1.2 
+```
+3. in file *run_swag_no_trainer.py*, change the min version:
+```
+check_min_version("4.33.0")
 ```
 4. in file *run.sh* add
 ``` 
+pip install -U -r "requirements.txt"
 pip install -U git+https://github.com/huggingface/accelerate
 ```
-5. add to file *requirements.txt*
-```
-transformers == 4.22.2
-torch == 1.12.1
-```
-6. 
+5. 
 ``` 
 bash run.sh
 ```
 
+
+### markdown language
 **bold**
 * Italic *  
 > blockquote
-
-
 `code`
 ---
 link:
