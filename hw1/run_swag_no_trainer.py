@@ -56,7 +56,7 @@ from transformers.utils import PaddingStrategy, check_min_version, send_example_
 
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.33.0")
+# check_min_version("4.33.0")
 
 logger = get_logger(__name__)
 # You should update this to your particular problem to have better documentation of `model_type`
@@ -285,6 +285,11 @@ class DataCollatorForMultipleChoice:
 
 
 def main():
+    
+    '''
+    1. Create Parser
+    '''
+    # create parser instance
     args = parse_args()
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
@@ -341,6 +346,10 @@ def main():
             os.makedirs(args.output_dir, exist_ok=True)
     accelerator.wait_for_everyone()
 
+
+    '''
+    2. Data input/Load Data
+    '''
     # Get the datasets: you can either provide your own CSV/JSON/TXT training and evaluation files (see below)
     # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
     # (the dataset will be downloaded automatically from the datasets Hub).
@@ -379,10 +388,13 @@ def main():
     question_header_name = "sent2"
     label_column_name = "label" if "label" in column_names else "labels"
 
+
+    ''' Load Pretrained model and tokenizer '''
     # Load pretrained model and tokenizer
     #
     # In distributed training, the .from_pretrained methods guarantee that only one local process can concurrently
     # download model & vocab.
+    ''' load config from Transformer'''
     if args.config_name:
         config = AutoConfig.from_pretrained(args.model_name_or_path, trust_remote_code=args.trust_remote_code)
     elif args.model_name_or_path:
@@ -391,11 +403,12 @@ def main():
         config = CONFIG_MAPPING[args.model_type]()
         logger.warning("You are instantiating a new config instance from scratch.")
 
-    if args.tokenizer_name:
+    ''' load tokenizer from Transformer'''
+    if args.tokenizer_name: # 若有輸入 tokenizer 的名子
         tokenizer = AutoTokenizer.from_pretrained(
             args.tokenizer_name, use_fast=not args.use_slow_tokenizer, trust_remote_code=args.trust_remote_code
         )
-    elif args.model_name_or_path:
+    elif args.model_name_or_path:   # 若有輸入 model name or path (從 hugging face 那裡)
         tokenizer = AutoTokenizer.from_pretrained(
             args.model_name_or_path, use_fast=not args.use_slow_tokenizer, trust_remote_code=args.trust_remote_code
         )
@@ -406,6 +419,7 @@ def main():
         )
 
     if args.model_name_or_path:
+        logger.info("you are using model: " + args.model_name_or_path)
         model = AutoModelForMultipleChoice.from_pretrained(
             args.model_name_or_path,
             from_tf=bool(".ckpt" in args.model_name_or_path),
