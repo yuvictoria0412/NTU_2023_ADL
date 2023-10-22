@@ -3,7 +3,7 @@ python run_qa_no_trainer.py \
   --train_file data/train.json \
   --validation_file data/valid.json \
   --max_seq_length 512 \
-  --output_dir report/ \
+  --output_dir train_qa/ \
   --per_device_train_batch_size 2 \
   --gradient_accumulation_steps 4 \
   --learning_rate 3e-5 \

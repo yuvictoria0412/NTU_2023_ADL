@@ -364,7 +364,16 @@ def main():
         datefmt="%m/%d/%Y %H:%M:%S",
         level=logging.INFO,
     )
+    '''
+    # record the logging information into file
+    filelog = logging.FileHandler(os.path.join(args.output_dir, "log.txt"))
+    # set logger file handler parameters
+    filelog.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s"))
+    filelog.setLevel(logging.INFO)
+    logging.addHandler(filelog)
+    '''
     logger.info(accelerator.state, main_process_only=False)
+
     if accelerator.is_local_main_process:
         datasets.utils.logging.set_verbosity_warning()
         transformers.utils.logging.set_verbosity_info()
@@ -826,6 +835,9 @@ def main():
         accelerator.init_trackers("qa_no_trainer", experiment_config)
 
     # Train!
+    loss_list = []
+    EM_list = []
+    F1_list = []
     total_batch_size = args.per_device_train_batch_size * accelerator.num_processes * args.gradient_accumulation_steps
 
     logger.info("***** Running training *****")
@@ -910,6 +922,10 @@ def main():
             if completed_steps >= args.max_train_steps:
                 break
 
+        loss_list.append(total_loss.cpu().item()/len(active_dataloader))
+        # print(len(active_dataloader))
+        # print(loss_list)
+
         if args.checkpointing_steps == "epoch":
             output_dir = f"epoch_{epoch}"
             if args.output_dir is not None:
@@ -928,43 +944,49 @@ def main():
                     commit_message=f"Training in progress epoch {epoch}", blocking=False, auto_lfs_prune=True
                 )
 
-    # Evaluation
-    logger.info("***** Running Evaluation *****")
-    logger.info(f"  Num examples = {len(eval_dataset)}")
-    logger.info(f"  Batch size = {args.per_device_eval_batch_size}")
+        # Evaluation
+        logger.info("***** Running Evaluation *****")
+        logger.info(f"  Num examples = {len(eval_dataset)}")
+        logger.info(f"  Batch size = {args.per_device_eval_batch_size}")
 
-    all_start_logits = []
-    all_end_logits = []
+        all_start_logits = []
+        all_end_logits = []
 
-    model.eval()
+        model.eval()
 
-    for step, batch in enumerate(eval_dataloader):
-        with torch.no_grad():
-            outputs = model(**batch)
-            start_logits = outputs.start_logits
-            end_logits = outputs.end_logits
+        for step, batch in enumerate(eval_dataloader):
+            with torch.no_grad():
+                outputs = model(**batch)
+                start_logits = outputs.start_logits
+                end_logits = outputs.end_logits
 
-            if not args.pad_to_max_length:  # necessary to pad predictions and labels for being gathered
-                start_logits = accelerator.pad_across_processes(start_logits, dim=1, pad_index=-100)
-                end_logits = accelerator.pad_across_processes(end_logits, dim=1, pad_index=-100)
+                if not args.pad_to_max_length:  # necessary to pad predictions and labels for being gathered
+                    start_logits = accelerator.pad_across_processes(start_logits, dim=1, pad_index=-100)
+                    end_logits = accelerator.pad_across_processes(end_logits, dim=1, pad_index=-100)
 
-            all_start_logits.append(accelerator.gather_for_metrics(start_logits).cpu().numpy())
-            all_end_logits.append(accelerator.gather_for_metrics(end_logits).cpu().numpy())
+                all_start_logits.append(accelerator.gather_for_metrics(start_logits).cpu().numpy())
+                all_end_logits.append(accelerator.gather_for_metrics(end_logits).cpu().numpy())
 
-    max_len = max([x.shape[1] for x in all_start_logits])  # Get the max_length of the tensor
+        max_len = max([x.shape[1] for x in all_start_logits])  # Get the max_length of the tensor
 
-    # concatenate the numpy array
-    start_logits_concat = create_and_fill_np_array(all_start_logits, eval_dataset, max_len)
-    end_logits_concat = create_and_fill_np_array(all_end_logits, eval_dataset, max_len)
+        # concatenate the numpy array
+        start_logits_concat = create_and_fill_np_array(all_start_logits, eval_dataset, max_len)
+        end_logits_concat = create_and_fill_np_array(all_end_logits, eval_dataset, max_len)
 
-    # delete the list of numpy arrays
-    del all_start_logits
-    del all_end_logits
+        # delete the list of numpy arrays
+        del all_start_logits
+        del all_end_logits
 
-    outputs_numpy = (start_logits_concat, end_logits_concat)
-    prediction = post_processing_function(eval_examples, eval_dataset, outputs_numpy)
-    eval_metric = metric.compute(predictions=prediction.predictions, references=prediction.label_ids)
-    logger.info(f"Evaluation metrics: {eval_metric}")
+        outputs_numpy = (start_logits_concat, end_logits_concat)
+        prediction = post_processing_function(eval_examples, eval_dataset, outputs_numpy)
+        # print(prediction.predictions[0])
+        # print(prediction.label_ids[0])
+        eval_metric = metric.compute(predictions=prediction.predictions, references=prediction.label_ids)
+        logger.info(f"Evaluation metrics: {eval_metric}")
+        EM_list.append(eval_metric["exact_match"])
+        F1_list.append(eval_metric["f1"])
+        # print(EM_list)
+        # print(F1_list)
 
     # Prediction
     if args.do_predict:
@@ -1002,7 +1024,6 @@ def main():
         outputs_numpy = (start_logits_concat, end_logits_concat)
         prediction = post_processing_function(predict_examples, predict_dataset, outputs_numpy)
         predict_metric = metric.compute(predictions=prediction.predictions, references=prediction.label_ids)
-        logger.info(f"Predict metrics: {predict_metric}")
 
     if args.with_tracking:
         log = {
@@ -1029,6 +1050,17 @@ def main():
 
             logger.info(json.dumps(eval_metric, indent=4))
             save_prefixed_metrics(eval_metric, args.output_dir)
+            if args.with_tracking:
+                logger.info(json.dumps(loss_list, indent=4))
+                logger.info(json.dumps(EM_list, indent=4))
+                logger.info(json.dumps(F1_list, indent=4))
+                with open("result.json", "w") as f:
+                    data = {
+                        "loss": loss_list,
+                        "exact match": EM_list,
+                        "f1 score": F1_list
+                    }
+                    json.dump(data, f)
 
 
 if __name__ == "__main__":
