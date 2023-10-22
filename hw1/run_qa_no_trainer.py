@@ -56,8 +56,7 @@ from transformers import (
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
-with open("data/context.json", "r") as f:
-    context_file = json.load(f)
+
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 # check_min_version("4.35.0.dev0")
@@ -109,6 +108,9 @@ def parse_args():
     )
     parser.add_argument(
         "--train_file", type=str, default=None, help="A csv or a json file containing the training data."
+    )
+    parser.add_argument(
+        "--context_file", type=str, default=None, help="A csv or a json file containing the training data."
     )
     parser.add_argument(
         "--preprocessing_num_workers", type=int, default=1, help="A csv or a json file containing the training data."
@@ -380,6 +382,9 @@ def main():
     else:
         datasets.utils.logging.set_verbosity_error()
         transformers.utils.logging.set_verbosity_error()
+
+    with open(args.context_file, "r") as f:
+        context_file = json.load(f)
 
     # If passed along, set the training seed now.
     if args.seed is not None:

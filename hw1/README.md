@@ -26,5 +26,6 @@ python inference.py
 ## Reproduce
 ```
 bash download.sh
-bash run.sh ./data/context.json ./data/test.json ./qa_pred.csv
+bash run.sh adl-hw1/data/context.json adl-hw1/data/test.json qa_pred.csv
 ```
+if you eant

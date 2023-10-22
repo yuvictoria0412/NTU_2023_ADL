@@ -9,4 +9,5 @@ param3="$3"
 # echo "The third parameter is: $param3"
 
 # context, test, output, mc model, qa model
-python inference.py "${1}" "${2}" "${3}" output_roberta_epoch_3 sample_output_mbl_n2
+
+python "inference.py" "${1}" "${2}" "${3}" adl-hw1/output_roberta_epoch_3 adl-hw1/sample_output_mbl_n2

@@ -11,7 +11,7 @@ exact_match = [x/100 for x in data['exact match']]
 f1_score = data['f1 score']
 
 # create the plot
-epochs = range(1, 6)
+epochs = range(1, len(loss) + 1)
 plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True))
 plt.plot(epochs, loss, label='loss', marker='o', color=(1/255, 155/255, 152/255))
 
@@ -23,6 +23,7 @@ plt.ylabel('Loss(%)')
 plt.title('Learning curve of the loss value')
 plt.legend()
 plt.show()
+plt.savefig('loss.png')
 # show the plot
 
 plt.gca().xaxis.set_major_locator(plt.MaxNLocator(integer=True))
@@ -33,3 +34,4 @@ plt.ylabel('Exact Match(%)')
 plt.title('Learning curve of the Exact Match metric value')
 plt.legend()
 plt.show()
+plt.savefig('exact_match.png')
