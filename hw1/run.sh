@@ -1,7 +1,7 @@
 
-param1="$1"
-param2="$2"
-param3="$3"
+# param1="$1"
+# param2="$2"
+# param3="$3"
 
 # Print or perform operations with the parameters
 # echo "The first parameter is: $param1"
