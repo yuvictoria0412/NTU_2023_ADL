@@ -9,23 +9,22 @@ pip install -r requirements.txt
 ## Multuple choice
 **Train**
 ```
-bash train_mc.sh
+bash train_mc.sh /path/to/train.json /path/to/valid.json /path/to/context.json /path/to/output_file
 ```
 
 ## Question answering
 **Train**
 ```
-bash train_qa.sh
+bash train_qa.sh /path/to/train.json /path/to/valid.json /path/to/context.json /path/to/output_file
 ```
 
 ## Inference
 ```
-python inference.py
+python inference.py /path/to/context.json /path/to/test.json /path/to/output_file /path/to/mc_model_dir /path/to/qa_model_dir
 ```
 
 ## Reproduce
 ```
 bash download.sh
-bash run.sh adl-hw1/data/context.json adl-hw1/data/test.json qa_pred.csv
+bash run.sh /path/to/context.json /path/to/test.json /path/to/output_file
 ```
-if you eant
