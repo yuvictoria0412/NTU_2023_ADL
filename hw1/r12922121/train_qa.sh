@@ -9,4 +9,5 @@ python run_qa_no_trainer.py \
   --gradient_accumulation_steps 4 \
   --learning_rate 3e-5 \
   --num_train_epochs 2 \
-  --with_tracking
+  --with_tracking \
+

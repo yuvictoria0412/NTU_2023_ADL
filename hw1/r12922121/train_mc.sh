@@ -10,3 +10,7 @@ python "train_mc.py"\
     --learning_rate 3e-5\
     --output_dir "$4"\
 
+
+
+
+# bash train_mc.sh ~/ADL_2023_NTU/hw1/data/train.json ~/ADL_2023_NTU/hw1/data/valid.json ~/ADL_2023_NTU/hw1/data/context.json last_check_train_mc
