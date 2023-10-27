@@ -10,8 +10,8 @@ pip install -r requirements.txt
 pip install git+https://github.com/huggingface/accelerate
 accelerate config
 ```
-![config answer](image.png)
-if you want to run at jupytoer notebook
+<!-- if you want to run at jupytoer notebook -->
+<!-- ![config answer](image.png) -->
 ```
 pip install fsspec==2023.9.2    # need this for load_dataset error
 pip install ipywidgets  # if you want to use jupyter notebook
