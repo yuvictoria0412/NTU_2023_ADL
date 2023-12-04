@@ -53,7 +53,7 @@ from transformers import (
 )
 from transformers.utils import check_min_version, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
-
+torch.cuda.set_device(0)
 ''' add dependency '''
 # from tw_rouge import get_rouge
 # get_rouge('我是人', '我是一個人')
@@ -696,7 +696,8 @@ def main():
 
     # update the progress_bar if load from checkpoint
     progress_bar.update(completed_steps)
-
+    loss_list = []
+    rouge_list = []
     for epoch in range(starting_epoch, args.num_train_epochs):
         model.train()
         if args.with_tracking:
@@ -733,6 +734,10 @@ def main():
             if completed_steps >= args.max_train_steps:
                 break
 
+        loss_list.append(total_loss.cpu().item()/len(active_dataloader))
+            
+
+        ## evaluate
         model.eval()
 
         gen_kwargs = {
@@ -746,7 +751,6 @@ def main():
                     attention_mask=batch["attention_mask"],
                     **gen_kwargs,
                 )
-
                 generated_tokens = accelerator.pad_across_processes(
                     generated_tokens, dim=1, pad_index=tokenizer.pad_token_id
                 )
@@ -774,6 +778,7 @@ def main():
                 )
         # result = metric.compute(use_stemmer=True)
         result = metric.compute()
+        rouge_list.append(result)
         # result = {k: round(v * 100, 4) for k, v in result.items()}
 
         logger.info(result)
@@ -816,6 +821,8 @@ def main():
             all_results = {f"eval_{k}": v for k, v in result.items()}
             with open(os.path.join(args.output_dir, "all_results.json"), "w") as f:
                 json.dump(all_results, f)
+                json.dump(loss_list, f)
+                json.dump(rouge_list, f)
 
 
 if __name__ == "__main__":
