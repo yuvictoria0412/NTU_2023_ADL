@@ -1,0 +1,30 @@
+/home/guest/r12922121/ADL_2023_NTU/hw3/17
+Mean perplexity: 4.7626604247093205/home/guest/r12922121/ADL_2023_NTU/hw3/18
+Mean perplexity: 4.992352768421173/home/guest/r12922121/ADL_2023_NTU/hw3/19
+Mean perplexity: 4.907936012744903/home/guest/r12922121/ADL_2023_NTU/hw3/20
+Mean perplexity: 4.751769126415253/home/guest/r12922121/ADL_2023_NTU/hw3/21
+Mean perplexity: 4.861359913349151/home/guest/r12922121/ADL_2023_NTU/hw3/22
+Mean perplexity: 4.503610553264618/home/guest/r12922121/ADL_2023_NTU/hw3/23
+Mean perplexity: 4.368559740543366/home/guest/r12922121/ADL_2023_NTU/hw3/24
+Mean perplexity: 4.328021273136139/home/guest/r12922121/ADL_2023_NTU/hw3/a
+Mean perplexity: 5.094550655841827
+/home/guest/r12922121/ADL_2023_NTU/hw3/a
+Mean perplexity: 3.531107563495636
+/home/guest/r12922121/ADL_2023_NTU/hw3/b
+Mean perplexity: 3.5635053997039794
+/home/guest/r12922121/ADL_2023_NTU/hw3/c
+Mean perplexity: 3.3925474438667296
+/home/guest/r12922121/ADL_2023_NTU/hw3/c
+Mean perplexity: 41.50224012184143
+/home/guest/r12922121/ADL_2023_NTU/hw3/c
+Mean perplexity: 3.3925474438667296
+/home/guest/r12922121/ADL_2023_NTU/hw3/c
+Mean perplexity: 41.50224012184143
+/home/guest/r12922121/ADL_2023_NTU/hw3/c
+Mean perplexity: 3.3549191761016846
+None
+Mean perplexity: 186.24643196105956
+None
+Mean perplexity: 5.1043517189025875
+None
+Mean perplexity: 4.798079551696778
